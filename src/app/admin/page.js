@@ -1,9 +1,29 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { seedProductsToFirestore } from '@/lib/firestore';
 
 export default function AdminDashboard() {
-  // Placeholder stats — will connect to Firestore in next iteration
+  const [syncing, setSyncing] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const handleSync = async () => {
+    if (!confirm('Deseja sincronizar os produtos locais com o banco de dados Firebase?')) return;
+    
+    setSyncing(true);
+    setMessage('');
+    
+    const result = await seedProductsToFirestore();
+    
+    if (result.success) {
+      setMessage('✅ Sincronização concluída!');
+    } else {
+      setMessage('❌ Erro: ' + result.error);
+    }
+    setSyncing(false);
+  };
+
+  // Placeholder stats
   const stats = [
     { label: 'Pedidos Hoje', value: '12', change: '+18%', positive: true, icon: '🛒' },
     { label: 'Receita Mensal', value: 'R$ 24.500', change: '+7%', positive: true, icon: '💰' },
@@ -29,14 +49,28 @@ export default function AdminDashboard() {
 
   return (
     <div className="page-enter">
-      <h1 style={{
-        fontFamily: 'var(--font-display)',
-        fontSize: 'var(--text-2xl)',
-        fontWeight: 800,
-        marginBottom: '2rem',
-      }}>
-        Dashboard
-      </h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <h1 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--text-2xl)',
+          fontWeight: 800,
+          margin: 0,
+        }}>
+          Dashboard
+        </h1>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {message && <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>{message}</span>}
+          <button 
+            onClick={handleSync}
+            disabled={syncing}
+            className="btn btn--primary"
+            style={{ padding: '0.5rem 1rem', fontSize: '13px' }}
+          >
+            {syncing ? 'Sincronizando...' : '🔄 Sincronizar Firestore'}
+          </button>
+        </div>
+      </div>
 
       {/* Stats Grid */}
       <div className="admin-stats-grid">

@@ -2,15 +2,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ProductCard from '@/components/storefront/ProductCard';
 import { CATEGORIES } from '@/constants/categories';
-import { getFeaturedProducts, formatPrice } from '@/constants/products';
+import { fetchProductsFromFirestore } from '@/lib/firestore';
+import { formatPrice } from '@/constants/products';
 
 export const metadata = {
   title: 'Caramuru Sacolas — Embalagens de Qualidade para seu Negócio',
   description: 'Compre sacolas, caixas, fitas e embalagens com os melhores preços. Frete grátis no primeiro pedido. Desconto por volume. Entrega para todo o Brasil.',
 };
 
-export default function HomePage() {
-  const featuredProducts = getFeaturedProducts();
+export default async function HomePage() {
+  const allProducts = await fetchProductsFromFirestore();
+  const featuredProducts = allProducts.filter(p => p.featured).slice(0, 8);
 
   return (
     <div className="page-enter">

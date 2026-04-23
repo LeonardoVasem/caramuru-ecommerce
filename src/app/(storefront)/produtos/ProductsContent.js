@@ -1,24 +1,35 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ProductCard from '@/components/storefront/ProductCard';
-import { PRODUCTS } from '@/constants/products';
+import { fetchProductsFromFirestore } from '@/lib/firestore';
 import { CATEGORIES, getAllCategories } from '@/constants/categories';
 
 export default function ProductsContent() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get('categoria');
 
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(categoryParam || '');
   const [sortBy, setSortBy] = useState('featured');
 
+  useEffect(() => {
+    async function loadProducts() {
+      const data = await fetchProductsFromFirestore();
+      setProducts(data);
+      setLoading(false);
+    }
+    loadProducts();
+  }, []);
+
   const allCategories = getAllCategories();
 
   const filteredProducts = useMemo(() => {
-    let result = PRODUCTS.filter((p) => p.status === 'active');
+    let result = products.filter((p) => p.status === 'active');
 
     if (selectedCategory) {
       result = result.filter(
@@ -114,7 +125,7 @@ export default function ProductsContent() {
                   onChange={() => setSelectedCategory('')}
                 />
                 Todas
-                <span className="filter-option__count">{PRODUCTS.length}</span>
+                <span className="filter-option__count">{products.length}</span>
               </label>
               {CATEGORIES.map((cat) => (
                 <div key={cat.id}>
@@ -127,7 +138,7 @@ export default function ProductsContent() {
                     />
                     {cat.icon} {cat.name}
                     <span className="filter-option__count">
-                      {PRODUCTS.filter((p) => p.parentCategoryId === cat.id).length}
+                      {products.filter((p) => p.parentCategoryId === cat.id).length}
                     </span>
                   </label>
                   {cat.children?.map((sub) => (
@@ -144,7 +155,7 @@ export default function ProductsContent() {
                       />
                       {sub.name}
                       <span className="filter-option__count">
-                        {PRODUCTS.filter((p) => p.categoryId === sub.id).length}
+                        {products.filter((p) => p.categoryId === sub.id).length}
                       </span>
                     </label>
                   ))}
@@ -159,11 +170,14 @@ export default function ProductsContent() {
             )}
           </aside>
 
-          {/* Main */}
-          <div>
+          <div className="listing__content" style={{ flex: 1 }}>
             <div className="listing__toolbar">
               <div className="listing__result-count">
-                <strong>{filteredProducts.length}</strong> produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+                {!loading && (
+                  <>
+                    <strong>{filteredProducts.length}</strong> produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+                  </>
+                )}
               </div>
               <div className="listing__sort">
                 <span>Ordenar:</span>
@@ -177,7 +191,13 @@ export default function ProductsContent() {
               </div>
             </div>
 
-            {filteredProducts.length > 0 ? (
+            {loading ? (
+              <div className="products-grid">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="skeleton" style={{ height: 380, borderRadius: 'var(--radius-xl)' }} />
+                ))}
+              </div>
+            ) : filteredProducts.length > 0 ? (
               <div className="products-grid">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
