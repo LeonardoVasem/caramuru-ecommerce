@@ -35,13 +35,13 @@ export default function Header() {
     <>
       {/* Announcement Bar */}
       <div className="announcement-bar">
-        <span className="announcement-bar__text">
-          🚚 Frete grátis no primeiro pedido! • 📦 Entrega para todo o Brasil • ⚡ Descontos exclusivos por volume
-        </span>
+        <div className="announcement-bar__content">
+            <span>🚀 Frete grátis no primeiro pedido! • 📦 Entrega para todo o Brasil • ⚡ Descontos exclusivos por volume</span>
+            <span>🚀 Frete grátis no primeiro pedido! • 📦 Entrega para todo o Brasil • ⚡ Descontos exclusivos por volume</span>
+        </div>
       </div>
 
-      {/* Header */}
-      <header className={`header ${scrolled ? 'header--scrolled' : ''}`}>
+      <header className={`header ${scrolled ? 'header--sticky' : ''}`} id="main-header">
         <div className="container header__inner">
           {/* Logo */}
           <Link href="/" className="header__logo">

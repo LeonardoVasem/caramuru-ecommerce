@@ -190,18 +190,49 @@ ul, ol {
    ANNOUNCEMENT BAR
    ============================================================ */
 
+/* --- Top Announcement Bar Marquee --- */
 .announcement-bar {
   background: var(--primary-600);
   color: white;
-  height: var(--announcement-height);
+  overflow: hidden;
+  white-space: nowrap;
+  height: 34px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  overflow: hidden;
-  position: relative;
+}
+
+.announcement-bar__content {
+  display: inline-block;
+  animation: marquee 40s linear infinite;
+  font-size: 13px;
+  font-weight: 600;
+  padding-right: 50px;
+}
+
+.announcement-bar__content span {
+    padding: 0 40px;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+/* --- Sticky Header Fix --- */
+.header {
+  background: white;
+  border-bottom: 1px solid var(--neutral-150);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow-sm);
+}
+
+.header__inner {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .announcement-bar__text {
@@ -1527,21 +1558,22 @@ ul, ol {
 
 @media (max-width: 768px) {
   .bottom-nav {
-    display: flex;
+    display: grid;
   }
 }
 
 .bottom-nav__item {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  text-decoration: none;
   color: var(--neutral-400);
-  transition: all var(--transition-fast);
-  padding: 8px 0;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: all 0.2s ease;
 }
 
 .bottom-nav__item--active {
