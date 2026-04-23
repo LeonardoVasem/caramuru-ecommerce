@@ -150,7 +150,17 @@ export default function HomePage() {
                 id={`category-${cat.id}`}
               >
                 <div className="category-card__image">
-                  <span className="category-card__icon">{cat.icon}</span>
+                  {cat.image ? (
+                    <Image
+                      src={cat.image}
+                      alt={cat.name}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      sizes="(max-width: 768px) 100vw, 20vw"
+                    />
+                  ) : (
+                    <span className="category-card__icon">{cat.icon}</span>
+                  )}
                 </div>
                 <div className="category-card__body">
                   <h3 className="category-card__name">{cat.name}</h3>

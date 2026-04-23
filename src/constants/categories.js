@@ -6,6 +6,7 @@ export const CATEGORIES = [
     parentId: null,
     description: 'Sacolas para todos os tipos de comércio',
     icon: '🛍️',
+    image: '/images/categories/sacolas.png',
     order: 1,
     status: 'active',
     children: [
@@ -60,6 +61,7 @@ export const CATEGORIES = [
     parentId: null,
     description: 'Caixas de papelão para envio e armazenamento',
     icon: '📦',
+    image: '/images/categories/caixas.png',
     order: 2,
     status: 'active',
     children: [
@@ -102,6 +104,7 @@ export const CATEGORIES = [
     parentId: null,
     description: 'Envelopes e sacos para envio de e-commerce',
     icon: '📮',
+    image: '/images/categories/sacos-ecommerce.png',
     order: 3,
     status: 'active',
     children: [
@@ -144,6 +147,7 @@ export const CATEGORIES = [
     parentId: null,
     description: 'Fitas adesivas e gomadas para lacre e embalagem',
     icon: '🎀',
+    image: '/images/categories/fitas.png',
     order: 4,
     status: 'active',
     children: [
@@ -186,6 +190,7 @@ export const CATEGORIES = [
     parentId: null,
     description: 'Papel de seda, enchimento, etiquetas e acessórios',
     icon: '✨',
+    image: '/images/categories/complementos.png',
     order: 5,
     status: 'active',
     children: [
