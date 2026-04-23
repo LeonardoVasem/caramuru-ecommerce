@@ -2899,3 +2899,109 @@ calc(64px + env(safe-area-inset-bottom));
     padding: var(--space-6);
   }
 }
+
+/* ============================================================
+   DESIGN REVAMP - HOME & NAVIGATION
+   ============================================================ */
+
+/* Benefits Bar - Estilo Magnani */
+.benefits {
+  background: #000000;
+  color: white;
+  padding: 60px 0;
+  margin: 0;
+}
+
+.benefits__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.benefits__item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.benefits__icon {
+  font-size: 1.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+}
+
+.benefits__title {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.benefits__desc {
+  color: #8E8E93;
+  font-size: 13px;
+}
+
+/* Bottom Navigation Bar - Redesigned */
+@media (max-width: 768px) {
+  .benefits {
+    padding: 40px 0;
+  }
+  
+  .benefits__grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(56px + env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    z-index: 9999;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .bottom-nav__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: #8E8E93;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .bottom-nav__item--active {
+    color: var(--primary-600);
+  }
+
+  .bottom-nav__icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  body {
+    padding-bottom: calc(74px + env(safe-area-inset-bottom));
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+}
