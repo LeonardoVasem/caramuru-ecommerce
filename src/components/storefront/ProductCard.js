@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/hooks/useCart';
 import { formatPrice } from '@/constants/products';
 
@@ -41,22 +42,32 @@ export default function ProductCard({ product }) {
 
       {/* Image */}
       <div className="product-card__image">
-        <div style={{
-          width: '100%',
-          height: '100%',
-          background: 'linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '3rem',
-          opacity: 0.6,
-        }}>
-          {product.parentCategoryId === 'sacolas' && '🛍️'}
-          {product.parentCategoryId === 'caixas' && '📦'}
-          {product.parentCategoryId === 'sacos-ecommerce' && '📮'}
-          {product.parentCategoryId === 'fitas' && '🎀'}
-          {product.parentCategoryId === 'complementos' && '✨'}
-        </div>
+        {product.featuredImage ? (
+          <Image 
+            src={product.featuredImage} 
+            alt={product.name} 
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            style={{ objectFit: 'cover' }}
+          />
+        ) : (
+          <div style={{
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '3rem',
+            opacity: 0.6,
+          }}>
+            {product.parentCategoryId === 'sacolas' && '🛍️'}
+            {product.parentCategoryId === 'caixas' && '📦'}
+            {product.parentCategoryId === 'sacos-ecommerce' && '📮'}
+            {product.parentCategoryId === 'fitas' && '🎀'}
+            {product.parentCategoryId === 'complementos' && '✨'}
+          </div>
+        )}
 
         {/* Quick actions */}
         <div className="product-card__quick-actions">

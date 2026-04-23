@@ -96,16 +96,7 @@ export default function Header() {
             </Link>
 
             {/* Mobile menu toggle */}
-            <button
-              className="header__menu-toggle"
-              onClick={() => setMobileOpen(true)}
-              aria-label="Abrir menu"
-              id="mobile-menu-toggle"
-            >
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
+            {/* Mobile menu toggle - REMOVED since we have BottomNav */}
           </div>
         </div>
       </header>

@@ -1,17 +1,66 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/hooks/useCart';
-import { getProductBySlug, formatPrice, PRODUCTS } from '@/constants/products';
+import { formatPrice } from '@/constants/products';
 import ProductCard from '@/components/storefront/ProductCard';
+import { db } from '@/lib/firebase';
+import { collection, query, where, onSnapshot, getDocs } from 'firebase/firestore';
 
 export default function ProductDetailPage({ params }) {
   const resolvedParams = use(params);
-  const product = getProductBySlug(resolvedParams.slug);
+  const { slug } = resolvedParams;
+  
+  const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
-  const [quantity, setQuantity] = useState(product?.pricing?.bulkPrices?.[0]?.minQty || 1);
-  const [activeImage, setActiveImage] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    async function loadProduct() {
+      try {
+        const q = query(collection(db, 'products'), where('slug', '==', slug));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          if (!snapshot.empty) {
+            const data = { ...snapshot.docs[0].data(), id: snapshot.docs[0].id };
+            setProduct(data);
+            setQuantity(data.pricing?.bulkPrices?.[0]?.minQty || 1);
+            
+            // Load related products
+            const relatedQ = query(
+                collection(db, 'products'), 
+                where('parentCategoryId', '==', data.parentCategoryId),
+                where('status', '==', 'active')
+            );
+            getDocs(relatedQ).then(relSnap => {
+                const relData = relSnap.docs
+                    .map(d => ({ ...d.data(), id: d.id }))
+                    .filter(p => p.id !== data.id)
+                    .slice(0, 4);
+                setRelatedProducts(relData);
+            });
+          }
+          setLoading(false);
+        });
+        return () => unsubscribe();
+      } catch (error) {
+        console.error("Error loading product:", error);
+        setLoading(false);
+      }
+    }
+    loadProduct();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="container" style={{ padding: '8rem 0', textAlign: 'center' }}>
+        <div className="skeleton" style={{ width: '100%', height: 400, borderRadius: 'var(--radius-xl)' }} />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -73,22 +122,33 @@ export default function ProductDetailPage({ params }) {
           {/* Gallery */}
           <div className="pdp__gallery">
             <div className="pdp__main-image">
-              <div style={{
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '8rem',
-                opacity: 0.6,
-              }}>
-                {product.parentCategoryId === 'sacolas' && '🛍️'}
-                {product.parentCategoryId === 'caixas' && '📦'}
-                {product.parentCategoryId === 'sacos-ecommerce' && '📮'}
-                {product.parentCategoryId === 'fitas' && '🎀'}
-                {product.parentCategoryId === 'complementos' && '✨'}
-              </div>
+              {product.featuredImage ? (
+                <Image 
+                  src={product.featuredImage} 
+                  alt={product.name} 
+                  fill 
+                  priority
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  style={{ objectFit: 'contain' }} 
+                />
+              ) : (
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '8rem',
+                  opacity: 0.6,
+                }}>
+                  {product.parentCategoryId === 'sacolas' && '🛍️'}
+                  {product.parentCategoryId === 'caixas' && '📦'}
+                  {product.parentCategoryId === 'sacos-ecommerce' && '📮'}
+                  {product.parentCategoryId === 'fitas' && '🎀'}
+                  {product.parentCategoryId === 'complementos' && '✨'}
+                </div>
+              )}
             </div>
           </div>
 

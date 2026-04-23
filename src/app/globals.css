@@ -1597,8 +1597,22 @@ ul, ol {
     padding: var(--space-12) 0;
   }
 
-  .header__search, .header__nav {
+  .container {
+    padding-left: var(--space-5);
+    padding-right: var(--space-5);
+  }
+
+  .header__search, .header__nav, .header__actions #header-account-btn {
     display: none;
+  }
+
+  /* Compact header on mobile */
+  .header__inner {
+    height: 60px;
+  }
+  
+  .header__logo {
+    font-size: 1.25rem;
   }
 
   .product-card__image {
@@ -1607,7 +1621,7 @@ ul, ol {
 
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-3);
+    gap: var(--space-4);
   }
 
   .product-card__body {
@@ -1624,13 +1638,24 @@ ul, ol {
   }
 
   .product-card__add-btn {
-     padding: var(--space-2);
+     padding: var(--space-3);
      font-size: 11px;
   }
 
   /* Padding at the bottom for fixed nav */
   body {
     padding-bottom: 74px;
+  }
+
+  /* Fix for sidebar filter on mobile - push below header */
+  .listing {
+    grid-template-columns: 1fr;
+    display: block;
+  }
+
+  .listing__sidebar {
+    position: static;
+    margin-bottom: var(--space-6);
   }
 }
 
