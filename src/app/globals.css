@@ -1794,9 +1794,6 @@ ul, ol {
   .benefits__title {
     font-size: var(--text-base);
   }
-}
-calc(64px + env(safe-area-inset-bottom));
-  }
 
   body {
     padding-bottom: calc(64px + env(safe-area-inset-bottom));
