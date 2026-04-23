@@ -99,6 +99,18 @@ export default function AdminProductsPage() {
     }
   };
 
+  // Save individual fields without closing the modal
+  const handleUpdateField = async (data) => {
+    if (!editingProduct) return;
+    try {
+      const docRef = doc(db, 'products', editingProduct.id);
+      await updateDoc(docRef, { ...data, updatedAt: new Date() });
+      setEditingProduct({ ...editingProduct, ...data });
+    } catch (error) {
+      console.error('Erro ao salvar campo:', error);
+    }
+  };
+
   const handleImageUpload = async (file) => {
     if (!editingProduct || !file) return;
     
@@ -251,32 +263,29 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
-      {/* Edit Modal */}
+      {/* Edit Modal — Full Product Manager */}
       {editingProduct && (
-        <div className="modal-overlay" style={{
+        <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
             background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', zIndex: 2000, 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+            display: 'flex', alignItems: 'flex-start', justifyContent: 'center', 
+            padding: '20px', overflowY: 'auto',
         }}>
-            <div className="modal-content page-enter" style={{
-                background: 'white', borderRadius: 'var(--radius-2xl)', 
-                width: '100%', maxWidth: '500px', padding: '2.5rem',
-                boxShadow: 'var(--shadow-2xl)'
+            <div className="page-enter" style={{
+                background: 'white', borderRadius: '20px', 
+                width: '100%', maxWidth: '560px', padding: '2rem',
+                boxShadow: '0 25px 50px rgba(0,0,0,0.25)', margin: '20px 0',
             }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', alignItems: 'center' }}>
-                    <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', margin: 0 }}>Gerenciar Produto</h2>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
+                    <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', margin: 0 }}>Gerenciar Produto</h2>
                     <button onClick={() => setEditingProduct(null)} style={{ border: 'none', background: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--neutral-400)' }}>×</button>
                 </div>
 
-                {/* Image Section */}
-                <div style={{ marginBottom: '2rem', padding: '1.5rem', background: 'var(--neutral-50)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--neutral-150)' }}>
-                    <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 700, marginBottom: '1rem', color: 'var(--neutral-800)' }}>Foto do Produto</label>
-                    <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-                        <div style={{ 
-                            width: 100, height: 100, borderRadius: 'var(--radius-lg)', 
-                            background: 'white', overflow: 'hidden', position: 'relative',
-                            border: '1px solid var(--neutral-200)', boxShadow: 'var(--shadow-sm)'
-                        }}>
+                {/* Image */}
+                <div style={{ marginBottom: '1.5rem', padding: '1rem', background: 'var(--neutral-50)', borderRadius: '12px', border: '1px solid var(--neutral-150)' }}>
+                    <label style={labelStyle}>Foto do Produto</label>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <div style={{ width: 80, height: 80, borderRadius: '12px', background: 'white', overflow: 'hidden', position: 'relative', border: '1px solid var(--neutral-200)', flexShrink: 0 }}>
                             {editingProduct.featuredImage ? (
                                 <Image src={editingProduct.featuredImage} alt="" fill style={{ objectFit: 'cover' }} />
                             ) : (
@@ -284,20 +293,10 @@ export default function AdminProductsPage() {
                             )}
                         </div>
                         <div style={{ flex: 1 }}>
-                            <p style={{ fontSize: '11px', color: 'var(--neutral-500)', marginBottom: '10px' }}>
-                                Use imagens quadradas (1:1) de alta qualidade para melhor resultado.
-                            </p>
-                            <input 
-                                type="file" 
-                                id="image-upload" 
-                                hidden 
-                                accept="image/*"
-                                onChange={(e) => handleImageUpload(e.target.files[0])}
-                            />
+                            <input type="file" id="image-upload" hidden accept="image/*" onChange={(e) => handleImageUpload(e.target.files[0])} />
                             <button 
-                                className={`btn ${uploading ? 'btn--ghost' : 'btn--secondary'} btn--sm`}
-                                style={{ width: '100%' }}
-                                disabled={uploading}
+                                className={`btn ${uploading ? 'btn--ghost' : 'btn--outline'} btn--sm`}
+                                style={{ width: '100%' }} disabled={uploading}
                                 onClick={() => document.getElementById('image-upload').click()}
                             >
                                 {uploading ? '⌛ Enviando...' : '📷 Alterar Foto'}
@@ -306,26 +305,103 @@ export default function AdminProductsPage() {
                     </div>
                 </div>
 
-                {/* Price Section */}
-                <div style={{ marginBottom: '2rem' }}>
-                    <label style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--neutral-800)' }}>Preço Unitário (R$)</label>
-                    <div style={{ position: 'relative' }}>
-                        <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontWeight: 600, color: 'var(--neutral-400)' }}>R$</span>
-                        <input 
-                            type="number" 
-                            className="input"
-                            style={{ paddingLeft: '2.5rem' }}
-                            step="0.01"
-                            defaultValue={editingProduct.pricing?.unitPrice}
-                            onBlur={(e) => handleUpdateProduct(editingProduct.id, { 
-                                pricing: { ...editingProduct.pricing, unitPrice: parseFloat(e.target.value) } 
-                            })}
-                        />
-                    </div>
-                    <p style={{ fontSize: '11px', color: 'var(--neutral-400)', marginTop: '6px' }}>Valor base para o cálculo de milheiro e descontos.</p>
+                {/* Name */}
+                <div style={fieldStyle}>
+                    <label style={labelStyle}>Nome do Produto</label>
+                    <input className="input" defaultValue={editingProduct.name}
+                        onBlur={(e) => handleUpdateField({ name: e.target.value })} />
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
+                {/* Description */}
+                <div style={fieldStyle}>
+                    <label style={labelStyle}>Descrição</label>
+                    <textarea className="input" rows={3} style={{ resize: 'vertical', minHeight: '70px' }}
+                        defaultValue={editingProduct.description || editingProduct.shortDescription || ''}
+                        onBlur={(e) => handleUpdateField({ description: e.target.value, shortDescription: e.target.value })}
+                        placeholder="Descreva o produto..."
+                    />
+                </div>
+
+                {/* Category */}
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem' }}>
+                    <div style={{ flex: 1 }}>
+                        <label style={labelStyle}>Categoria</label>
+                        <select className="input" defaultValue={editingProduct.parentCategoryId || ''}
+                            onChange={(e) => handleUpdateField({ parentCategoryId: e.target.value })}>
+                            <option value="sacolas">🛍️ Sacolas</option>
+                            <option value="caixas">📦 Caixas</option>
+                            <option value="sacos-ecommerce">📮 Sacos E-commerce</option>
+                            <option value="fitas">🎀 Fitas</option>
+                            <option value="complementos">✨ Complementos</option>
+                        </select>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <label style={labelStyle}>Subcategoria</label>
+                        <input className="input" defaultValue={editingProduct.categoryId || ''}
+                            onBlur={(e) => handleUpdateField({ categoryId: e.target.value })}
+                            placeholder="ex: sacolas-kraft" />
+                    </div>
+                </div>
+
+                {/* Status + Featured */}
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem' }}>
+                    <div style={{ flex: 1 }}>
+                        <label style={labelStyle}>Status</label>
+                        <select className="input" defaultValue={editingProduct.status || 'active'}
+                            onChange={(e) => handleUpdateField({ status: e.target.value })}>
+                            <option value="active">✅ Ativo</option>
+                            <option value="inactive">⛔ Inativo</option>
+                        </select>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <label style={labelStyle}>Destaque?</label>
+                        <select className="input" defaultValue={editingProduct.featured ? 'true' : 'false'}
+                            onChange={(e) => handleUpdateField({ featured: e.target.value === 'true' })}>
+                            <option value="false">Não</option>
+                            <option value="true">⭐ Sim — aparece na home</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Pricing */}
+                <div style={fieldStyle}>
+                    <label style={labelStyle}>Preço Unitário (R$)</label>
+                    <div style={{ position: 'relative' }}>
+                        <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontWeight: 600, color: 'var(--neutral-400)', fontSize: '13px' }}>R$</span>
+                        <input type="number" className="input" style={{ paddingLeft: '2.5rem' }}
+                            step="0.01" defaultValue={editingProduct.pricing?.unitPrice}
+                            onBlur={(e) => handleUpdateField({ 
+                                pricing: { ...editingProduct.pricing, unitPrice: parseFloat(e.target.value) || 0 } 
+                            })} />
+                    </div>
+                </div>
+
+                {/* Specifications */}
+                <div style={{ marginBottom: '1rem', padding: '1rem', background: 'var(--neutral-50)', borderRadius: '12px', border: '1px solid var(--neutral-150)' }}>
+                    <label style={labelStyle}>Especificações Técnicas</label>
+                    <div style={{ display: 'grid', gap: '8px' }}>
+                        {[
+                          { key: 'material', label: 'Material', placeholder: 'ex: Papel Kraft 90g' },
+                          { key: 'largura', label: 'Largura (cm)', placeholder: 'ex: 30' },
+                          { key: 'altura', label: 'Altura (cm)', placeholder: 'ex: 40' },
+                          { key: 'fundo', label: 'Fundo (cm)', placeholder: 'ex: 12' },
+                          { key: 'cor', label: 'Cor', placeholder: 'ex: Branco' },
+                          { key: 'gramatura', label: 'Gramatura', placeholder: 'ex: 90g/m²' },
+                        ].map((spec) => (
+                            <div key={spec.key} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--neutral-600)', minWidth: '80px' }}>{spec.label}</span>
+                                <input className="input" style={{ flex: 1, padding: '6px 10px', fontSize: '13px' }}
+                                    defaultValue={editingProduct.specifications?.[spec.key] || ''}
+                                    placeholder={spec.placeholder}
+                                    onBlur={(e) => handleUpdateField({
+                                        specifications: { ...(editingProduct.specifications || {}), [spec.key]: e.target.value }
+                                    })} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '0.5rem' }}>
                     <button className="btn btn--primary btn--full" onClick={() => setEditingProduct(null)}>Concluir e Fechar</button>
                 </div>
             </div>
@@ -334,3 +410,6 @@ export default function AdminProductsPage() {
     </div>
   );
 }
+
+const labelStyle = { display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '6px', color: 'var(--neutral-700)', textTransform: 'uppercase', letterSpacing: '0.03em' };
+const fieldStyle = { marginBottom: '1rem' };
