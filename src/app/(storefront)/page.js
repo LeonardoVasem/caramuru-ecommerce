@@ -15,9 +15,18 @@ export default async function HomePage() {
 
   return (
     <div className="page-enter">
-      {/* Hero Section */}
+      {/* Hero Section — with real banner image */}
       <section className="hero" id="hero-section">
         <div className="hero__bg-pattern" />
+        <div className="hero__banner-image">
+          <Image
+            src="/images/hero-banner.png"
+            alt="Embalagens premium — sacolas, caixas e fitas"
+            fill
+            priority
+            style={{ objectFit: 'cover', opacity: 0.2 }}
+          />
+        </div>
         <div className="container hero__content">
           <div className="hero__text">
             <div className="hero__badge">
@@ -77,11 +86,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Categories — Horizontal Scroll on Mobile */}
+      {/* Categories — Horizontal Scroll */}
       <section className="section">
         <div className="container">
           <div className="section__header">
             <h2 className="section__title">Categorias</h2>
+            <Link href="/produtos" className="section__link">Ver todas →</Link>
           </div>
           <div className="categories-scroll">
             {CATEGORIES.map((category) => (

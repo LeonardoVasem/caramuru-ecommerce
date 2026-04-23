@@ -111,14 +111,10 @@ export default function ProductCard({ product }) {
           </span>
         </div>
 
-        {/* Add button */}
-        <button
-          className="product-card__add-btn"
-          onClick={handleAddToCart}
-          id={`add-to-cart-${product.id}`}
-        >
+        {/* CTA — navigates via parent Link */}
+        <span className="product-card__add-btn">
           Ver Detalhes
-        </button>
+        </span>
       </div>
     </Link>
   );

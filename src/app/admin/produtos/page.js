@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { db, storage } from '@/lib/firebase';
-import { doc, updateDoc, collection, onSnapshot, query } from 'firebase/firestore';
+import { doc, updateDoc, addDoc, collection, onSnapshot, query } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { formatPrice } from '@/constants/products';
 import Image from 'next/image';
@@ -37,11 +37,63 @@ export default function AdminProductsPage() {
     return matchSearch && matchStatus;
   });
 
+  const handleAddProduct = async () => {
+    const name = prompt('Nome do produto:');
+    if (!name || !name.trim()) return;
+
+    const slug = name.trim().toLowerCase()
+      .replace(/[àáâã]/g, 'a').replace(/[éêë]/g, 'e')
+      .replace(/[íî]/g, 'i').replace(/[óôõ]/g, 'o')
+      .replace(/[úû]/g, 'u').replace(/[ç]/g, 'c')
+      .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    try {
+      const docRef = await addDoc(collection(db, 'products'), {
+        name: name.trim(),
+        slug,
+        shortDescription: '',
+        description: '',
+        status: 'active',
+        featured: false,
+        featuredImage: '',
+        parentCategoryId: 'sacolas',
+        categoryId: 'sacolas-kraft',
+        tags: [],
+        specifications: {},
+        pricing: {
+          unitPrice: 0,
+          unit: 'un',
+          bulkPrices: [
+            { label: '1.000 un', minQty: 1000, price: 0 },
+          ],
+        },
+        reviewCount: 0,
+        salesCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      // Open the edit modal right away
+      setEditingProduct({
+        id: docRef.id,
+        name: name.trim(),
+        slug,
+        status: 'active',
+        featuredImage: '',
+        pricing: { unitPrice: 0, unit: 'un', bulkPrices: [] },
+        parentCategoryId: 'sacolas',
+        categoryId: 'sacolas-kraft',
+      });
+    } catch (error) {
+      alert('Erro ao criar produto: ' + error.message);
+    }
+  };
+
   const handleUpdateProduct = async (id, data) => {
     try {
       const docRef = doc(db, 'products', id);
       await updateDoc(docRef, { ...data, updatedAt: new Date() });
-      if (!uploading) setEditingProduct(null); // Only close if not in the middle of an upload
+      if (!uploading) setEditingProduct(null);
     } catch (error) {
       alert('Erro ao atualizar produto: ' + error.message);
     }
@@ -52,7 +104,6 @@ export default function AdminProductsPage() {
     
     setUploading(true);
     try {
-      // Create a professional path for the image
       const fileExt = file.name.split('.').pop();
       const fileName = `featured_${Date.now()}.${fileExt}`;
       const storageRef = ref(storage, `products/${editingProduct.id}/${fileName}`);
@@ -66,7 +117,6 @@ export default function AdminProductsPage() {
         updatedAt: new Date()
       });
       
-      // Update local state for the modal
       setEditingProduct({...editingProduct, featuredImage: downloadURL});
       alert('Imagem atualizada com sucesso!');
     } catch (error) {
@@ -87,15 +137,11 @@ export default function AdminProductsPage() {
     <div className="page-enter">
       <div className="admin-action-bar">
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-2xl)', fontWeight: 800 }}>
-          Produtos
+          Produtos ({filtered.length})
         </h1>
-        <div style={{ display: 'flex', gap: '8px' }}>
-             {products.length === 0 && (
-               <span style={{ fontSize: '12px', color: 'var(--warning)', background: 'var(--warning-50)', padding: '4px 12px', borderRadius: '4px' }}>
-                ⚠️ Nenhum produto no Firestore. Vá ao Dashboard e clique em "Sincronizar".
-              </span>
-             )}
-        </div>
+        <button className="btn btn--primary" onClick={handleAddProduct}>
+          + Novo Produto
+        </button>
       </div>
 
       {/* Filters */}

@@ -27,7 +27,7 @@ export default function ProductDetailPage({ params }) {
           if (!snapshot.empty) {
             const data = { ...snapshot.docs[0].data(), id: snapshot.docs[0].id };
             setProduct(data);
-            setQuantity(data.pricing?.bulkPrices?.[0]?.minQty || 1);
+            setQuantity(data.pricing?.bulkPrices?.[0]?.minQty || 1000);
             
             // Load related products
             const relatedQ = query(
