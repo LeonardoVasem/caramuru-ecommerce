@@ -87,11 +87,6 @@ export default function ProductDetailPage({ params }) {
   const currentPrice = getCurrentPrice();
   const totalPrice = currentPrice * quantity;
 
-  // Related products
-  const relatedProducts = PRODUCTS
-    .filter((p) => p.parentCategoryId === product.parentCategoryId && p.id !== product.id && p.status === 'active')
-    .slice(0, 4);
-
   const handleAddToCart = () => {
     addItem(product, quantity);
   };
@@ -122,7 +117,17 @@ export default function ProductDetailPage({ params }) {
           {/* Gallery */}
           <div className="pdp__gallery">
             <div className="pdp__main-image">
-              {product.featuredImage ? (
+              {product.featuredImage && product.featuredImage.startsWith('http') ? (
+                <Image 
+                  src={product.featuredImage} 
+                  alt={product.name} 
+                  fill 
+                  priority
+                  unoptimized={true}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  style={{ objectFit: 'contain' }} 
+                />
+              ) : product.featuredImage ? (
                 <Image 
                   src={product.featuredImage} 
                   alt={product.name} 

@@ -42,7 +42,16 @@ export default function ProductCard({ product }) {
 
       {/* Image */}
       <div className="product-card__image">
-        {product.featuredImage ? (
+        {product.featuredImage && product.featuredImage.startsWith('http') ? (
+          <Image 
+            src={product.featuredImage} 
+            alt={product.name} 
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            style={{ objectFit: 'cover' }}
+            unoptimized={true}
+          />
+        ) : product.featuredImage ? (
           <Image 
             src={product.featuredImage} 
             alt={product.name} 
