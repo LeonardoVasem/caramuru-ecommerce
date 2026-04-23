@@ -17,7 +17,8 @@ export default function ProductDetailPage({ params }) {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(1000);
+  const [showCustomQty, setShowCustomQty] = useState(false);
 
   useEffect(() => {
     async function loadProduct() {
@@ -247,33 +248,47 @@ export default function ProductDetailPage({ params }) {
               </div>
             </div>
 
-            {/* Quantity */}
-            <div className="pdp__quantity">
+            {/* Quantity — Preset Options */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <span className="pdp__quantity-label">Quantidade:</span>
-              <div className="pdp__quantity-control">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {[1000, 2000, 5000, 10000].map((qty) => (
+                  <button
+                    key={qty}
+                    className={`btn ${quantity === qty && !showCustomQty ? 'btn--primary' : 'btn--outline'} btn--sm`}
+                    onClick={() => { setQuantity(qty); setShowCustomQty(false); }}
+                    style={{ minWidth: '80px' }}
+                  >
+                    {qty.toLocaleString('pt-BR')}
+                  </button>
+                ))}
                 <button
-                  className="pdp__quantity-btn"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  aria-label="Diminuir quantidade"
+                  className={`btn ${showCustomQty ? 'btn--primary' : 'btn--outline'} btn--sm`}
+                  onClick={() => { setShowCustomQty(true); }}
+                  style={{ minWidth: '80px' }}
                 >
-                  −
-                </button>
-                <input
-                  type="number"
-                  className="pdp__quantity-input"
-                  value={quantity}
-                  min={1}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                  id="pdp-quantity-input"
-                />
-                <button
-                  className="pdp__quantity-btn"
-                  onClick={() => setQuantity(quantity + 1)}
-                  aria-label="Aumentar quantidade"
-                >
-                  +
+                  Outra
                 </button>
               </div>
+              {showCustomQty && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="number"
+                    className="input"
+                    style={{ width: '140px' }}
+                    min={1000}
+                    step={100}
+                    value={quantity}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value) || 1000;
+                      setQuantity(Math.max(1000, val));
+                    }}
+                    id="pdp-custom-quantity"
+                    placeholder="Mín. 1.000"
+                  />
+                  <span style={{ fontSize: '13px', color: 'var(--neutral-500)' }}>unidades (mín. 1.000)</span>
+                </div>
+              )}
             </div>
 
             {/* Actions */}
