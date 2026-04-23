@@ -3,7 +3,6 @@ import Image from 'next/image';
 import ProductCard from '@/components/storefront/ProductCard';
 import { CATEGORIES } from '@/constants/categories';
 import { fetchProductsFromFirestore } from '@/lib/firestore';
-import { formatPrice } from '@/constants/products';
 
 export const metadata = {
   title: 'Caramuru Sacolas — Embalagens de Qualidade para seu Negócio',
@@ -17,30 +16,39 @@ export default async function HomePage() {
   return (
     <div className="page-enter">
       {/* Hero Section */}
-      <section className="hero">
-        <div className="container">
-          <div className="hero__grid">
-            <div className="hero__content">
-              <h1 className="hero__title">
-                Embalagens que <span className="text-primary">valorizam</span> seu negócio.
-              </h1>
-              <p className="hero__text">
-                Sacolas, caixas, fitas e tudo que você precisa para embalar com qualidade. Preços de atacado, entrega rápida e descontos exclusivos por volume.
-              </p>
-              <div className="hero__actions">
-                <Link href="/produtos" className="btn btn--primary btn--lg">
-                  Ver Produtos →
-                </Link>
-                <Link href="/contato" className="btn btn--outline btn--lg">
-                  Fale Conosco
-                </Link>
-              </div>
+      <section className="hero" id="hero-section">
+        <div className="hero__bg-pattern" />
+        <div className="container hero__content">
+          <div className="hero__text">
+            <div className="hero__badge">
+              <span className="hero__badge-dot" />
+              Frete grátis no primeiro pedido
+            </div>
+            <h1 className="hero__title">
+              Embalagens que
+              <span>valorizam</span>
+              seu negócio.
+            </h1>
+            <p className="hero__subtitle">
+              Sacolas, caixas, fitas e tudo que você precisa para embalar com qualidade.
+              Preços de atacado, entrega rápida e descontos exclusivos por volume.
+            </p>
+            <div className="hero__actions">
+              <Link href="/produtos" className="btn btn--white btn--lg">
+                Ver Produtos
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+              <Link href="/contato" className="btn btn--outline-white btn--lg">
+                Fale Conosco
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Benefits Bar - Estilo Magnani */}
+      {/* Benefits Bar */}
       <section className="benefits">
         <div className="container">
           <div className="benefits__grid">
@@ -69,28 +77,27 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured Categories */}
+      {/* Categories — Horizontal Scroll on Mobile */}
       <section className="section">
         <div className="container">
           <div className="section__header">
-            <h2 className="section__title">Nossas Categorias</h2>
-            <Link href="/produtos" className="section__link">Ver todas →</Link>
+            <h2 className="section__title">Categorias</h2>
           </div>
-          <div className="categories-grid">
-            {CATEGORIES.slice(0, 5).map((category) => (
+          <div className="categories-scroll">
+            {CATEGORIES.map((category) => (
               <Link
                 key={category.id}
                 href={`/produtos?categoria=${category.slug}`}
-                className="category-card"
+                className="category-chip"
               >
-                <div className="category-card__image">
-                   {category.image ? (
-                     <Image src={category.image} alt={category.name} fill style={{ objectFit: 'contain' }} />
-                   ) : (
-                     <div style={{ fontSize: '3rem' }}>{category.icon}</div>
-                   )}
+                <div className="category-chip__icon">
+                  {category.image ? (
+                    <Image src={category.image} alt={category.name} fill style={{ objectFit: 'cover' }} />
+                  ) : (
+                    <span>{category.icon}</span>
+                  )}
                 </div>
-                <h3 className="category-card__name">{category.name}</h3>
+                <span className="category-chip__name">{category.name}</span>
               </Link>
             ))}
           </div>
@@ -98,7 +105,7 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Products */}
-      <section className="section section--bg">
+      <section className="section section--gray">
         <div className="container">
           <div className="section__header">
             <h2 className="section__title">Destaques da Semana</h2>

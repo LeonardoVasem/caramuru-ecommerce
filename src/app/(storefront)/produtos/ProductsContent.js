@@ -70,7 +70,7 @@ export default function ProductsContent() {
     }
 
     return result;
-  }, [selectedCategory, searchTerm, sortBy]);
+  }, [products, selectedCategory, searchTerm, sortBy]);
 
   const clearFilters = () => {
     setSearchTerm('');
