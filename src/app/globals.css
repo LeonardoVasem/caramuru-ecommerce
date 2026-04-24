@@ -1968,7 +1968,8 @@ ul, ol {
 
   /* PDP — Product Detail Page */
   .pdp {
-    padding: 16px 0 var(--space-12);
+    padding-top: 16px;
+    padding-bottom: var(--space-12);
   }
 
   .pdp__grid {
@@ -2036,7 +2037,8 @@ ul, ol {
 
 
 .pdp {
-  padding: var(--space-6) 0 var(--space-16);
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-16);
 }
 
 .pdp__breadcrumb {

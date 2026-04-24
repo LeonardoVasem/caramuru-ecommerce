@@ -83,12 +83,13 @@ export default function ProductDetailPage({ params }) {
     );
   }
 
-  // Calculate current price based on quantity
+  // Calculate current price based on quantity tiers
   const getCurrentPrice = () => {
-    if (!product.pricing.bulkPrices) return product.pricing.unitPrice;
-    const sorted = [...product.pricing.bulkPrices].sort((a, b) => b.minQty - a.minQty);
-    const applicable = sorted.find((bp) => quantity >= bp.minQty);
-    return applicable ? applicable.price : product.pricing.unitPrice;
+    const base = product.pricing.unitPrice;
+    if (quantity >= 10000) return base * 0.82;
+    if (quantity >= 5000) return base * 0.88;
+    if (quantity >= 2000) return base * 0.95;
+    return base;
   };
 
   const currentPrice = getCurrentPrice();
@@ -189,47 +190,53 @@ export default function ProductDetailPage({ params }) {
               )}
             </div>
 
-            {/* Bulk pricing table — updated quantities */}
-            {product.pricing.bulkPrices && product.pricing.bulkPrices.length > 1 && (
-              <table className="pdp__bulk-table">
-                <thead>
-                  <tr>
-                    <th>Quantidade</th>
-                    <th>Preço/un</th>
-                    <th>Economia</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {product.pricing.bulkPrices.map((bp, i) => {
-                    const savings = product.pricing.bulkPrices[0].price - bp.price;
-                    const isActive = quantity >= bp.minQty && 
-                      (i === product.pricing.bulkPrices.length - 1 || 
-                       quantity < product.pricing.bulkPrices[i + 1]?.minQty);
-                    return (
-                      <tr key={i} style={isActive ? { background: 'var(--primary-50)' } : {}}>
-                        <td style={{ fontWeight: isActive ? 700 : 400 }}>{bp.label}</td>
-                        <td style={{ fontWeight: 700, color: isActive ? 'var(--primary-600)' : 'inherit' }}>
-                          {formatPrice(bp.price)}
-                        </td>
-                        <td>
-                          {savings > 0 ? (
-                            <span style={{ 
-                              color: 'var(--success)', fontWeight: 600, fontSize: '12px',
-                              background: 'var(--success-light)', padding: '2px 8px', 
-                              borderRadius: '4px' 
-                            }}>
-                              -{Math.round((savings / product.pricing.bulkPrices[0].price) * 100)}%
-                            </span>
-                          ) : (
-                            <span style={{ color: 'var(--neutral-300)', fontSize: '12px' }}>—</span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
+            {/* Bulk pricing table — fixed quantities */}
+            <table className="pdp__bulk-table">
+              <thead>
+                <tr>
+                  <th>Quantidade</th>
+                  <th>Preço/un</th>
+                  <th>Economia</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { qty: 1000, label: '1.000 un', discount: 0 },
+                  { qty: 2000, label: '2.000 un', discount: 0.05 },
+                  { qty: 5000, label: '5.000 un', discount: 0.12 },
+                  { qty: 10000, label: '10.000 un', discount: 0.18 },
+                ].map((tier) => {
+                  const tierPrice = product.pricing.unitPrice * (1 - tier.discount);
+                  const isActive = quantity === tier.qty && !showCustomQty;
+                  return (
+                    <tr key={tier.qty} 
+                      style={{ 
+                        background: isActive ? 'var(--primary-50)' : 'transparent',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => { setQuantity(tier.qty); setShowCustomQty(false); }}
+                    >
+                      <td style={{ fontWeight: isActive ? 700 : 400 }}>{tier.label}</td>
+                      <td style={{ fontWeight: 700, color: isActive ? 'var(--primary-600)' : 'inherit' }}>
+                        {formatPrice(tierPrice)}
+                      </td>
+                      <td>
+                        {tier.discount > 0 ? (
+                          <span style={{ 
+                            color: '#16a34a', fontWeight: 600, fontSize: '12px',
+                            background: '#f0fdf4', padding: '2px 8px', borderRadius: '4px' 
+                          }}>
+                            -{Math.round(tier.discount * 100)}%
+                          </span>
+                        ) : (
+                          <span style={{ color: 'var(--neutral-300)', fontSize: '12px' }}>—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
 
             {/* Total */}
             <div style={{
